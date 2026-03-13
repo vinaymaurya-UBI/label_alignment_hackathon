@@ -1,0 +1,89 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+.eggs/
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.log
+
+# Build / Distribution
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.installed.cfg
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Node
+node_modules/
+.npm
+.yarn/
+.pnpm-store/
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite
+.vite/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.env
+.env.local
+.env.production
+.env.development
+secrets.json
+*_secrets.json
+config/secrets.json
+data/*.env
+data/*_secrets.json
+
+# Database (exclude local/dev DBs; keep sample if needed)
+# data/drug_ra.db
+
+# Vector Store
+vector_store/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Jupyter
+.ipynb_checkpoints/
+
+# uv
+.uv/

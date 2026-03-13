@@ -2,14 +2,63 @@
 
 AI-Powered Cross-Country Drug Label Comparison & Regulatory Intelligence Platform
 
+> Architecture diagrams use [Mermaid](https://mermaid.js.org/). They render on GitHub and in editors with Mermaid support (e.g. VS Code with Markdown Preview Mermaid Support).
+
 ## Table of Contents
 
+- [Quick Setup](#quick-setup)
 - [Overview](#overview)
 - [Architecture](#architecture)
+
+## Quick Setup
+
+Get the project running in 5 minutes:
+
+```bash
+# 1. Clone the repository
+git clone <your-repo-url>
+cd drug-ra
+
+# 2. Create virtual environment and install dependencies
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+# source .venv/bin/activate  # Linux/Mac
+
+pip install -r requirements.txt
+
+# 3. Set up environment variables
+copy .env.example .env
+# Edit .env and add your ANTHROPIC_API_KEY (optional, for AI features)
+
+# 4. Initialize the database with real regulatory data
+python scripts/fetch_and_store_real_data.py
+
+# 5. Start the backend server
+cd backend
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+# 6. In a new terminal, start the frontend
+cd frontend
+npm install
+npm run dev
+```
+
+**Access the application:**
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
+
+**That's it!** The database includes real regulatory data from:
+- **US**: FDA openFDA API (23 drugs)
+- **EU**: EMA EPAR (20 drugs)
+- **GB**: UK EMC (9 drugs)
+
+For detailed setup, see [Installation](#installation) below.
   - [System Architecture](#system-architecture)
   - [Data Flow](#data-flow)
   - [Component Diagram](#component-diagram)
   - [Database Schema](#database-schema)
+  - [Request-Response Flow](#request-response-flow)
 - [Features](#features)
 - [Data Sources](#data-sources)
 - [Quick Start](#quick-start)
@@ -178,7 +227,7 @@ graph LR
     AIService --> Anthropic[Anthropic API]
     SearchAPI --> VectorService
     VectorService --> VecJSONL
-    AdminAPI --> AdminAPI
+    AdminAPI --> SQLite
 
     style App fill:#e3f2fd
     style AIService fill:#f3e5f5
@@ -351,6 +400,7 @@ sequenceDiagram
 >
 > **Important**: When no data is found from an API or website for a particular drug/country combination, the system shows "No data found" instead of using mock or simulated data. Only real regulatory data from official sources is included in the platform.
 
+
 ## Quick Start
 
 ### Prerequisites
@@ -362,29 +412,26 @@ sequenceDiagram
 ### Installation
 
 ```bash
-# Backend
-cd backend
+# From project root (drug-ra/)
 uv venv
 # On Windows: .venv\Scripts\activate
 # On Unix: source .venv/bin/activate
-uv pip install -r requirements.txt
+uv pip install -r backend/requirements.txt
 
 # Frontend
 cd frontend
 npm install
+cd ..
 ```
 
-Copy `.env` to the project root (or create from `.env.example` if present) and set `ANTHROPIC_API_KEY` for AI reports. Optional: `DATABASE_URL` (defaults to project-root `data/drug_ra.db`), `CORS_ORIGINS` (default includes `http://localhost:5173`).
+Copy `.env` to the project root (or create from `.env.example` if present) and set `ANTHROPIC_API_KEY` or `GLM_API_KEY` for AI reports. Optional: `DATABASE_URL` (defaults to project-root `data/drug_ra.db`), `CORS_ORIGINS` (default includes `http://localhost:5173`).
 
 ### Running the Application
 
-**Backend (from project root or backend/):**
+**Backend (run from project root with venv activated):**
 
 ```bash
-# From project root
-cd backend && uv run python main.py
-
-# Or with uvicorn (from backend/)
+cd backend
 uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
@@ -399,7 +446,7 @@ cd frontend && npm run dev
 
 ### Verify database has data
 
-If the API returns empty drug lists, ensure the DB is populated and the server is using the project-root DB (config resolves `data/drug_ra.db` from project root):
+If the API returns empty drug lists, ensure the DB is populated. Run from **project root** (with venv activated):
 
 ```bash
 uv run python scripts/check_db_data.py
@@ -498,25 +545,26 @@ Backend serves JSON (and SSE for reports). The React frontend (port 5173) consum
 
 Configure via `.env` at the project root. The backend loads it; `DATABASE_URL` is resolved to the project-root DB when set to the default relative path.
 
-```env
-# Required for AI report generation
-ANTHROPIC_API_KEY=your_api_key_here
+```ini
+# Required for AI report generation (use one)
+ANTHROPIC_API_KEY=your_anthropic_key_here
+GLM_API_KEY=your_glm_key_here
 
-# Optional: defaults to project-root data/drug_ra.db (path resolved from backend config)
+# Optional: defaults to project-root data/drug_ra.db
 DATABASE_URL=sqlite+aiosqlite:///./data/drug_ra.db
 
 # Optional: API server
 API_HOST=0.0.0.0
 API_PORT=8000
 
-# Optional: CORS (comma-separated); frontend dev server
+# Optional: CORS (comma-separated)
 CORS_ORIGINS=http://localhost:5173
 
 # Optional: logging and debug
 DEBUG=true
 LOG_LEVEL=INFO
 
-# Optional: vector store path (relative to cwd when backend runs)
+# Optional: vector store path
 VECTOR_STORE_PATH=data/vector_store
 ```
 
@@ -593,4 +641,5 @@ For issues, questions, or suggestions:
 
 ---
 
-**Built with ❤️ for pharmaceutical regulatory intelligence**
+**Built with care for pharmaceutical regulatory intelligence**
+

@@ -78,6 +78,8 @@ export interface SemanticSearchResult {
   section_id: string;
   label_id: string;
   drug_id: string;
+  drug_name: string;
+  brand_name: string | null;
   country_code: string;
   heading: string;
   content: string;

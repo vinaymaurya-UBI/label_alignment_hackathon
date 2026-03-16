@@ -19,10 +19,12 @@ def _ensure_vector_store_dir() -> str:
 class VectorDocument:
     section_id: int
     label_id: int
-    drug_id: int
+    drug_id: str
     country_code: str
     heading: str
     content: str
+    drug_name: str
+    brand_name: str
     embedding: list[float]
 
 
@@ -45,10 +47,12 @@ class VectorStore:
                     VectorDocument(
                         section_id=data["section_id"],
                         label_id=data["label_id"],
-                        drug_id=data["drug_id"],
+                        drug_id=data.get("drug_id", ""),
                         country_code=data["country_code"],
                         heading=data["heading"],
                         content=data["content"],
+                        drug_name=data.get("drug_name", "Unknown"),
+                        brand_name=data.get("brand_name", "N/A"),
                         embedding=data["embedding"],
                     )
                 )
@@ -67,6 +71,8 @@ class VectorStore:
                             "country_code": d.country_code,
                             "heading": d.heading,
                             "content": d.content,
+                            "drug_name": d.drug_name,
+                            "brand_name": d.brand_name,
                             "embedding": d.embedding,
                         }
                     )
@@ -101,6 +107,8 @@ class VectorStore:
                     country_code=row["country_code"],
                     heading=row["heading"],
                     content=row["content"],
+                    drug_name=row.get("drug_name", "Unknown"),
+                    brand_name=row.get("brand_name", "N/A"),
                     embedding=emb,
                 )
             )

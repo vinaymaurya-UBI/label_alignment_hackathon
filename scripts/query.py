@@ -185,7 +185,7 @@ async def compare_drugs(drug_names: List[str]):
 async def main():
     """Main menu for querying data."""
     print("\n" + "="*60)
-    print("DRUG LABEL ALIGNMENT PLATFORM - QUERY INTERFACE")
+    print("NEURONEXT REGULATORY INTELLIGENCE - QUERY INTERFACE")
     print("="*60)
 
     while True:

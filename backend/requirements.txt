@@ -5,5 +5,6 @@ aiosqlite
 pydantic
 pydantic-settings
 anthropic
+google-generativeai
 python-docx
 python-dotenv

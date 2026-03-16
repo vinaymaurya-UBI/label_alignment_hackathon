@@ -124,6 +124,18 @@ async def get_drug_detail(drug_id: str, db: AsyncSession = Depends(get_db)) -> J
     if not drug:
         raise HTTPException(status_code=404, detail="Drug not found")
 
+    # Log view activity
+    from app.models import ActivityLog
+    new_log = ActivityLog(
+        type="view",
+        title=f"Drug Viewed: {drug.generic_name}",
+        subtitle=f"Viewed full labels and sections for {drug.generic_name}",
+        status="Viewed",
+        meta={"drug_id": drug_id}
+    )
+    db.add(new_log)
+    await db.commit()
+
     labels_result = await db.execute(
         select(DrugLabel, RegulatoryAuthority)
         .join(RegulatoryAuthority, DrugLabel.authority_id == RegulatoryAuthority.id)
@@ -180,6 +192,18 @@ async def compare_drug_labels(drug_id: str, db: AsyncSession = Depends(get_db)) 
     drug = drug_result.scalar_one_or_none()
     if not drug:
         raise HTTPException(status_code=404, detail="Drug not found")
+
+    # Log comparison activity
+    from app.models import ActivityLog
+    new_log = ActivityLog(
+        type="compare",
+        title=f"Label Comparison: {drug.generic_name}",
+        subtitle=f"Side-by-side analysis of global regulatory sections",
+        status="Analyzed",
+        meta={"drug_id": drug_id}
+    )
+    db.add(new_log)
+    await db.commit()
 
     labels_result = await db.execute(
         select(DrugLabel, RegulatoryAuthority)

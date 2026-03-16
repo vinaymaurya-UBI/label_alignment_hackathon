@@ -1,4 +1,4 @@
-# Drug Label Alignment Platform
+# NeuroNext Regulatory Intelligence
 
 AI-Powered Cross-Country Drug Label Comparison & Regulatory Intelligence Platform
 
@@ -28,7 +28,8 @@ pip install -r requirements.txt
 
 # 3. Set up environment variables
 copy .env.example .env
-# Edit .env and add your ANTHROPIC_API_KEY (optional, for AI features)
+# Edit .env and add your GOOGLE_API_KEY or ANTHROPIC_API_KEY
+# Note: .env values will now override system environment variables for this project.
 
 # 4. Initialize the database with real regulatory data
 python scripts/fetch_and_store_real_data.py
@@ -354,7 +355,8 @@ sequenceDiagram
 ## Features
 
 - **Multi-Country Drug Database**: Drugs and labels from US (FDA openFDA) with country-mapped section naming (US, EU, GB, CA, JP, AU)
-- **AI-Powered Reports**: Claude generates cross-country comparison reports; streamed via SSE
+- **AI-Powered Reports**: Google Gemini (primary) or Anthropic Claude (fallback) generates cross-country comparison reports; streamed via SSE
+- **Intelligent Insights**: Strategic "Regulatory AI Insight" displayed on drug detail pages with Markdown-enhanced formatting for better readability
 - **DOCX Export**: Download reports as Word documents (tables, headings, lists)
 - **Semantic Search**: Search across label sections using vector similarity (embeddings in `data/vector_store/`)
 - **Cross-Country Comparison**: Compare the same drug across authorities via `/api/v1/drugs/{id}/compare`
@@ -543,15 +545,20 @@ Backend serves JSON (and SSE for reports). The React frontend (port 5173) consum
 
 ## Environment Variables
 
-Configure via `.env` at the project root. The backend loads it; `DATABASE_URL` is resolved to the project-root DB when set to the default relative path.
+Configure via `.env` at the project root. The backend loads it; `DATABASE_URL` is resolved to the project-root DB when set to the default relative path. **Note: Local `.env` values override system environment variables.**
 
 ```ini
-# Required for AI report generation (use one)
+# Required for AI report generation (use at least one)
+GOOGLE_API_KEY=your_gemini_key_here
 ANTHROPIC_API_KEY=your_anthropic_key_here
-GLM_API_KEY=your_glm_key_here
+
+# Optional: AI Model Selection
+GOOGLE_MODEL=gemini-2.5-flash
+ANTHROPIC_MODEL=claude-3-haiku-20240307
 
 # Optional: defaults to project-root data/drug_ra.db
 DATABASE_URL=sqlite+aiosqlite:///./data/drug_ra.db
+```
 
 # Optional: API server
 API_HOST=0.0.0.0
@@ -606,17 +613,18 @@ uv run python scripts/check_db_data.py
 
 ## AI Report Features
 
-The AI-generated reports (Claude) include:
-- Executive summary and cross-country comparison
-- Discrepancy detection with severity levels
-- Country-specific regulatory notes and compliance recommendations
-- Markdown output streamed via SSE; DOCX export with headings, tables, lists
+The AI-generated reports and insights (Gemini/Claude) include:
+- **Strategic Intelligence**: Automated "Regulatory AI Insight" summary on drug detail pages with Markdown support (bolding, lists).
+- **Executive Summary**: High-level cross-country comparison and key findings.
+- **Discrepancy Detection**: Analysis of mismatches between jurisdictions with severity levels.
+- **Compliance Recommendations**: Actionable steps for regulatory alignment.
+- **Multi-Format Output**: Markdown output streamed via SSE; professional DOCX export.
 
 ## Technology Stack
 
-- **Backend**: FastAPI, SQLAlchemy 2.0 (async), aiosqlite
-- **Frontend**: React 18, Vite, MUI (Material-UI), React Query, Zustand, Axios
-- **AI**: Anthropic Claude (report generation)
+- **Backend**: FastAPI, SQLAlchemy 2.0 (async), aiosqlite, Pydantic Settings
+- **Frontend**: React 18, Vite, Tailwind CSS (with Typography), Lucide Icons, React Markdown
+- **AI**: Google Gemini (Primary), Anthropic Claude (Fallback)
 - **Database**: SQLite at `data/drug_ra.db` (path resolved from project root)
 - **Search**: In-memory vector store over JSONL embeddings (cosine similarity)
 - **Documents**: python-docx for DOCX export

@@ -80,3 +80,15 @@ class LabelSection(Base):
     created_at = Column(DateTime, server_default=func.now())
 
     label = relationship("DrugLabel", back_populates="sections")
+
+
+class ActivityLog(Base):
+    __tablename__ = "activity_logs"
+
+    id = Column(String, primary_key=True, default=_uuid)
+    type = Column(String(50), nullable=False)  # 'report', 'search', 'sync', 'view'
+    title = Column(String(255), nullable=False)
+    subtitle = Column(Text)
+    status = Column(String(50))
+    created_at = Column(DateTime, server_default=func.now())
+    meta = Column(JSON, default={})

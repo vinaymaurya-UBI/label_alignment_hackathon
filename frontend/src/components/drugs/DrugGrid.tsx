@@ -1,71 +1,50 @@
-import { useState, useCallback } from "react";
-import { Grid, Pagination, Typography, Box, CircularProgress, Alert } from "@mui/material";
-import { useDrugs, type DrugFilters } from "../../hooks/useDrugs";
+import React from "react";
+import { useDrugs } from "../../hooks/useDrugs";
 import DrugCard from "./DrugCard";
-import DrugFilters from "./DrugFilters";
+import { Loader2, Inbox } from "lucide-react";
 
-const PAGE_SIZE = 12;
+interface DrugGridProps {
+  search?: string;
+}
 
-function DrugGrid() {
-  const [filters, setFilters] = useState<DrugFilters>({
-    search: "",
-    manufacturer: "",
-    country: "",
-    limit: PAGE_SIZE,
-    offset: 0,
-  });
-  const [page, setPage] = useState(1);
+function DrugGrid({ search }: DrugGridProps) {
+  const { data: response, isLoading, error } = useDrugs({ search });
 
-  const { data, isLoading, error } = useDrugs(filters);
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+        <p className="text-slate-500 font-bold animate-pulse">Loading drug catalog...</p>
+      </div>
+    );
+  }
 
-  const update = useCallback((patch: Partial<DrugFilters>) => {
-    setFilters((f) => ({ ...f, ...patch, offset: 0 }));
-    setPage(1);
-  }, []);
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-100 p-8 rounded-3xl text-center">
+        <p className="text-red-600 font-bold">Error loading drugs. Please try again later.</p>
+      </div>
+    );
+  }
 
-  const handlePage = (_: unknown, p: number) => {
-    setPage(p);
-    setFilters((f) => ({ ...f, offset: (p - 1) * PAGE_SIZE }));
-  };
-
-  const totalPages = data ? Math.ceil(data.total / PAGE_SIZE) : 1;
+  if (!response?.drugs?.length) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
+        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+          <Inbox className="w-8 h-8 text-slate-300" />
+        </div>
+        <h3 className="text-xl font-black text-slate-900">No drugs found</h3>
+        <p className="text-slate-500 font-medium mt-1">Try adjusting your filters or search criteria.</p>
+      </div>
+    );
+  }
 
   return (
-    <Box>
-      <DrugFilters
-        search={filters.search ?? ""}
-        manufacturer={filters.manufacturer ?? ""}
-        country={filters.country ?? ""}
-        onSearch={(v) => update({ search: v })}
-        onManufacturer={(v) => update({ manufacturer: v })}
-        onCountry={(v) => update({ country: v })}
-      />
-
-      <Box mt={2} mb={1} display="flex" alignItems="center" gap={1}>
-        {isLoading && <CircularProgress size={18} />}
-        {!isLoading && data && (
-          <Typography variant="body2" color="text.secondary">
-            Showing {data.drugs.length} of {data.total} drugs
-          </Typography>
-        )}
-      </Box>
-
-      {error && <Alert severity="error">Failed to load drugs. Is the backend running?</Alert>}
-
-      <Grid container spacing={2}>
-        {data?.drugs.map((drug) => (
-          <Grid item xs={12} sm={6} md={4} key={drug.id}>
-            <DrugCard drug={drug} />
-          </Grid>
-        ))}
-      </Grid>
-
-      {totalPages > 1 && (
-        <Box display="flex" justifyContent="center" mt={3}>
-          <Pagination count={totalPages} page={page} onChange={handlePage} color="primary" />
-        </Box>
-      )}
-    </Box>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {response.drugs.map((drug) => (
+        <DrugCard key={drug.id} drug={drug} />
+      ))}
+    </div>
   );
 }
 

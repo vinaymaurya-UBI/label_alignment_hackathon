@@ -3,7 +3,7 @@ import { useState } from "react";
 import useReportStream from "../../hooks/useReportStream";
 
 interface Props {
-  drugId: number;
+  drugId: string;
   onReport: (markdown: string) => void;
 }
 

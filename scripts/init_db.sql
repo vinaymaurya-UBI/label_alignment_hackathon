@@ -1,4 +1,4 @@
--- Drug Label Alignment Platform - Database Initialization Script
+-- NeuroNext Regulatory Intelligence - Database Initialization Script
 -- This script creates all necessary tables, indexes, and initial data
 
 -- Enable UUID extension

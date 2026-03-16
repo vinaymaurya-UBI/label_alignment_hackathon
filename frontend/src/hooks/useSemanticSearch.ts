@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { api } from "../services/api";
 import type { SemanticSearchResult } from "../types";
 
@@ -7,7 +7,7 @@ export function useSemanticSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const search = async (query: string) => {
+  const search = useCallback(async (query: string) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -19,7 +19,7 @@ export function useSemanticSearch() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   return { data, isLoading, error, search };
 }

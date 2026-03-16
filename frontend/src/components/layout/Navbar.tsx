@@ -1,5 +1,6 @@
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box, Container, alpha } from "@mui/material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import MedicationIcon from "@mui/icons-material/Medication";
 
 const links = [
   { label: "Drugs", to: "/" },
@@ -11,25 +12,59 @@ function Navbar() {
   const { pathname } = useLocation();
 
   return (
-    <AppBar position="static" sx={{ background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}>
-      <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>
-          Drug Label Alignment
-        </Typography>
-        <Box>
-          {links.map((l) => (
-            <Button
-              key={l.to}
-              color="inherit"
-              component={RouterLink}
-              to={l.to}
-              sx={{ fontWeight: pathname === l.to ? 700 : 400, textDecoration: pathname === l.to ? "underline" : "none" }}
+    <AppBar position="sticky">
+      <Container maxWidth="lg">
+        <Toolbar disableGutters>
+          <Box
+            component={RouterLink}
+            to="/"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              color: "primary.main",
+              mr: 4,
+            }}
+          >
+            <MedicationIcon sx={{ mr: 1, fontSize: 28, color: "primary.main" }} />
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
+                color: "text.primary",
+              }}
             >
-              {l.label}
-            </Button>
-          ))}
-        </Box>
-      </Toolbar>
+              NeuroNext
+            </Typography>
+          </Box>
+          <Box sx={{ flexGrow: 1, display: "flex", gap: 1 }}>
+            {links.map((l) => {
+              const isActive = pathname === l.to;
+              return (
+                <Button
+                  key={l.to}
+                  component={RouterLink}
+                  to={l.to}
+                  sx={{
+                    color: isActive ? "primary.main" : "text.secondary",
+                    backgroundColor: isActive ? (theme) => alpha(theme.palette.primary.main, 0.08) : "transparent",
+                    "&:hover": {
+                      color: "primary.main",
+                      backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04),
+                    },
+                    px: 2,
+                    borderRadius: 2,
+                  }}
+                >
+                  {l.label}
+                </Button>
+              );
+            })}
+          </Box>
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 }

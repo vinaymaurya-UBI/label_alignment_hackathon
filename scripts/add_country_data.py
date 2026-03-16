@@ -243,7 +243,7 @@ async def show_coverage():
 async def main():
     """Main entry point."""
     print("\n" + "="*80)
-    print("DRUG LABEL ALIGNMENT PLATFORM - MULTI-COUNTRY DATA INGESTION")
+    print("NEURONEXT REGULATORY INTELLIGENCE - MULTI-COUNTRY DATA INGESTION")
     print("="*80)
     print("\n[NOTE] This script now fetches REAL data from regulatory authorities.")
     print("        It no longer uses mock/simulated data.")

@@ -2,11 +2,15 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, List
 
+from dotenv import load_dotenv
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, NoDecode
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 # Project root (parent of backend/) so DB path is correct whether server runs from backend/ or root
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+
+# Load .env before initializing settings to ensure override of system env vars
+load_dotenv(_PROJECT_ROOT / ".env", override=True)
 
 
 def _default_database_url() -> str:
@@ -15,7 +19,7 @@ def _default_database_url() -> str:
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Drug Label Alignment Platform"
+    APP_NAME: str = "NeuroNext Regulatory Intelligence"
     VERSION: str = "0.1.0"
     DEBUG: bool = True
 
@@ -54,11 +58,17 @@ class Settings(BaseSettings):
     # AI provider keys (optional, ignore if not used)
     ANTHROPIC_API_KEY: str | None = None
     ANTHROPIC_BASE_URL: str | None = None
+    ANTHROPIC_MODEL: str = "claude-3-haiku-20240307"
 
-    class Config:
-        env_file = _PROJECT_ROOT / ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = True
+    GOOGLE_API_KEY: str | None = None
+    GOOGLE_MODEL: str = "gemini-2.5-flash"
+
+    model_config = SettingsConfigDict(
+        env_file=str(_PROJECT_ROOT / ".env"),
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore"
+    )
 
 
 @lru_cache()
@@ -67,4 +77,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-

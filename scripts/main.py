@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 # Setup logging
 logging.basicConfig(
@@ -265,7 +265,7 @@ async def create_embeddings(vector_store: VectorStore, session):
 async def main():
     """Main function to fetch and store drug data."""
     logger.info("=" * 60)
-    logger.info("Drug Label Alignment Platform - Data Fetcher")
+    logger.info("NeuroNext Regulatory Intelligence - Data Fetcher")
     logger.info("=" * 60)
 
     try:

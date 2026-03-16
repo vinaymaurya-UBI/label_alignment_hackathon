@@ -176,29 +176,33 @@ flowchart TD
 ```mermaid
 graph LR
     subgraph "Frontend (React + Vite, port 5173)"
-        App[React App]
-        DrugsPage[Drugs List / Catalog]
-        DrugDetail[Drug Detail]
-        CompareView[Compare Labels]
-        ReportView[AI Report]
-        SearchView[Semantic Search]
+        App["React App"]
+        DrugsPage["Drugs List / Catalog"]
+        DrugDetail["Drug Detail"]
+        CompareView["Compare Labels"]
+        ReportView["AI Report"]
+        SearchView["Semantic Search"]
     end
 
     subgraph "Backend API (FastAPI, port 8000)"
-        DrugsAPI[/api/v1/drugs]
-        AIAPI[/api/v1/ai]
-        SearchAPI[/api/v1/search]
-        AdminAPI[/api/v1/admin]
+        DrugsAPI["/api/v1/drugs"]
+        AIAPI["/api/v1/ai"]
+        SearchAPI["/api/v1/search"]
+        AdminAPI["/api/v1/admin"]
     end
 
     subgraph "Backend Services"
-        AIService[AI Service]
-        VectorService[Vector Service]
+        AIService["AI Service"]
+        VectorService["Vector Service"]
     end
 
     subgraph "Data"
-        SQLite[(SQLite)]
-        VecJSONL[(vectors.jsonl)]
+        SQLite[("SQLite")]
+        VecJSONL[("vectors.jsonl")]
+    end
+
+    subgraph "External"
+        Anthropic["Anthropic API"]
     end
 
     App --> DrugsPage
@@ -216,7 +220,7 @@ graph LR
     DrugsAPI --> SQLite
     AIAPI --> AIService
     AIService --> SQLite
-    AIService --> Anthropic[Anthropic API]
+    AIService --> Anthropic
     SearchAPI --> VectorService
     VectorService --> VecJSONL
     AdminAPI --> SQLite
@@ -304,42 +308,43 @@ sequenceDiagram
 
     %% List drugs
     User->>Frontend: Browse drugs
-    Frontend->>API: GET /api/v1/drugs/?limit=12&offset=0
-    API->>DB: SELECT drugs + labels
+    Frontend->>API: GET /api/v1/drugs?limit=12&offset=0
+    API->>DB: SELECT drugs and labels
     DB-->>API: rows
-    API-->>Frontend: { drugs, total, limit, offset }
+    API-->>Frontend: drugs list
     Frontend-->>User: Catalog
 
     %% Drug detail + compare
     User->>Frontend: Open drug
     Frontend->>API: GET /api/v1/drugs/{id}
-    API->>DB: drug + labels + sections
+    API->>DB: fetch drug and labels
     DB-->>API: data
-    API-->>Frontend: drug + labels[]
+    API-->>Frontend: drug details
     Frontend->>API: GET /api/v1/drugs/{id}/compare
-    API->>DB: labels + sections by heading
+    API->>DB: fetch comparison sections
     DB-->>API: comparisons
-    API-->>Frontend: comparisons[]
-    Frontend-->>User: Detail + Compare
+    API-->>Frontend: comparisons
+    Frontend-->>User: Detail and Compare view
 
     %% AI Report (SSE)
     User->>Frontend: Generate AI Report
-    Frontend->>API: POST /api/v1/ai/generate-report/{id} (SSE)
-    API->>Service: generate_report(db, drug_id)
-    Service->>DB: drug + all labels/sections
+    Frontend->>API: POST /api/v1/ai/generate-report/{id}
+    API->>Service: generate_report
+    Service->>DB: fetch labels and sections
     DB-->>Service: data
-    Service->>Anthropic: Claude prompt
-    Anthropic-->>Service: Markdown
+    Service->>Anthropic: send prompt
+    Anthropic-->>Service: markdown report
     Service-->>API: stream events
-    API-->>Frontend: data: { status, report }
-    Frontend-->>User: Render report; optional DOCX via POST /download-docx
+    API-->>Frontend: report chunks
+    Frontend-->>User: Render report
+    Frontend->>API: POST /download-docx
 
     %% Semantic search
     User->>Frontend: Search
-    Frontend->>API: POST /api/v1/search/semantic { query, top_k }
+    Frontend->>API: POST /api/v1/search/semantic
     API->>Vec: search(query, top_k)
-    Vec-->>API: VectorDocument[]
-    API-->>Frontend: [{ section_id, drug_id, heading, content }, ...]
+    Vec-->>API: results
+    API-->>Frontend: matched sections
     Frontend-->>User: Results
 ```
 

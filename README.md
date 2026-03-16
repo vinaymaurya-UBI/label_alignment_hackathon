@@ -79,41 +79,41 @@ This platform automatically collects, standardizes, and compares drug labels acr
 ```mermaid
 graph TB
     subgraph "Client Layer"
-        UI[React SPA<br/>Vite + MUI<br/>localhost:5173]
+        UI["React SPA - Vite + MUI - localhost:5173"]
     end
 
     subgraph "API Layer - FastAPI (backend/)"
-        Router[FastAPI App<br/>main.py]
-        DrugAPI[/api/v1/drugs]
-        AIAPI[/api/v1/ai]
-        SearchAPI[/api/v1/search]
-        AdminAPI[/api/v1/admin]
+        Router["FastAPI App - main.py"]
+        DrugAPI["/api/v1/drugs"]
+        AIAPI["/api/v1/ai"]
+        SearchAPI["/api/v1/search"]
+        AdminAPI["/api/v1/admin"]
     end
 
     subgraph "Service Layer"
-        AIService[AI Service<br/>Claude 3.5]
-        VectorStore[Vector Store<br/>JSONL + embeddings]
+        AIService["AI Service - Claude 3.5"]
+        VectorStore["Vector Store - JSONL + embeddings"]
     end
 
     subgraph "Data Layer"
-        SQLite[(SQLite<br/>data/drug_ra.db)]
-        DrugTable[drugs]
-        LabelTable[drug_labels]
-        SectionTable[label_sections]
-        AuthorityTable[regulatory_authorities]
-        VectorFile[data/vector_store/<br/>vectors.jsonl]
+        SQLite[("SQLite - data/drug_ra.db")]
+        DrugTable["drugs"]
+        LabelTable["drug_labels"]
+        SectionTable["label_sections"]
+        AuthorityTable["regulatory_authorities"]
+        VectorFile["data/vector_store/vectors.jsonl"]
     end
 
     subgraph "External"
-        Anthropic[Anthropic API<br/>Claude]
+        Anthropic["Anthropic API - Claude"]
     end
 
     subgraph "Ingestion (scripts/)"
-        Populate[populate_all_countries_real_data.py]
-        BuildVec[build_vector_store.py]
+        Populate["populate_all_countries_real_data.py"]
+        BuildVec["build_vector_store.py"]
     end
 
-    UI -->|CORS| Router
+    UI --> Router
     Router --> DrugAPI
     Router --> AIAPI
     Router --> SearchAPI
@@ -122,7 +122,6 @@ graph TB
     DrugAPI --> SQLite
     AIAPI --> AIService
     SearchAPI --> VectorStore
-    AdminAPI --> Router
 
     AIService --> Anthropic
     AIService --> SQLite
@@ -135,15 +134,7 @@ graph TB
 
     Populate --> SQLite
     BuildVec --> VectorFile
-
-    style UI fill:#e1f5ff
-    style Router fill:#fff4e6
-    style AIService fill:#f3e5f5
-    style VectorStore fill:#e8f5e9
-    style SQLite fill:#fce4ec
-    style Anthropic fill:#ffccbc
 ```
-
 ### Data Flow
 
 ```mermaid
